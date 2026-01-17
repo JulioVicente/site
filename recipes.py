@@ -4,14 +4,6 @@ Recipe collection for frozen meal prep (marmitas congeladas)
 Recipes use ingredients commonly available in Porto Alegre supermarkets
 """
 
-# Recipe data structure:
-# Each recipe includes:
-# - name: recipe name
-# - description: brief description
-# - ingredients: list of (quantity, unit, ingredient, calories_per_unit, glycemic_index)
-# - instructions: step-by-step instructions
-# - servings: number of servings
-
 RECIPES = [
     {
         "name": "Frango com Batata Doce e Brócolis",
@@ -154,6 +146,10 @@ RECIPES = [
     },
 ]
 
+# Nutritional calculation constants
+CARB_PERCENTAGE = 0.25  # Estimated percentage of carbs in food (25%)
+CALORIES_PER_GRAM_CARB = 4  # Carbohydrates provide 4 calories per gram
+
 
 def calculate_recipe_nutrition(recipe):
     """Calculate total calories and glycemic load for a recipe"""
@@ -175,14 +171,15 @@ def calculate_recipe_nutrition(recipe):
         total_calories += calories
         
         # Calculate glycemic load (GL = GI * carbs / 100)
-        # Rough estimation: assume carbs are 30% of calories for carb sources
+        # Rough estimation: assume carbs are 25% of calories for carb sources
         gi = ing["gi"]
         if gi > 0:
             # Rough carb estimation (varies by food type)
             if "cal_per_100g" in ing or "cal_per_100ml" in ing:
-                estimated_carbs = (qty / 100) * (ing.get("cal_per_100g", ing.get("cal_per_100ml", 0)) * 0.25 / 4)  # carbs = 4 cal/g
+                cal_value = ing.get("cal_per_100g", ing.get("cal_per_100ml", 0))
+                estimated_carbs = (qty / 100) * (cal_value * CARB_PERCENTAGE / CALORIES_PER_GRAM_CARB)
             else:
-                estimated_carbs = (calories * 0.25 / 4)
+                estimated_carbs = (calories * CARB_PERCENTAGE / CALORIES_PER_GRAM_CARB)
             
             gl = (gi * estimated_carbs) / 100
             total_gl += gl
