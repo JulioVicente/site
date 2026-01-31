@@ -1,5 +1,27 @@
 # Changelog - MCP Dataverse
 
+## [2024-01-31] - Análise de Custos Azure
+
+### ✅ Adicionado
+
+#### Documentação de Custos
+- **COST_ANALYSIS.md**: Análise completa de impacto de custos Azure
+  - Modelo de custos detalhado (Consumption Plan vs Premium)
+  - Custos do Dataverse API e rate limits
+  - Impacto do cache na redução de custos (80-90% economia)
+  - Estimativas para diferentes volumes de uso
+  - Otimizações para reduzir custos
+  - Cenários de uso com cálculos reais
+  - Comparação com alternativas de implementação
+  - Checklist de otimização
+  - Recomendações por tamanho de empresa
+
+#### Destaques da Análise
+- **Até 1M req/mês**: GRÁTIS com Consumption Plan
+- **5M req/mês**: ~$66/mês com cache (vs $626 sem cache)
+- **Cache reduz custos em 80-90%** e elimina throttling
+- **ROI imediato**: Cache é grátis (em memória)
+
 ## [2024-01-31] - Melhorias de Performance e Completude de Dados
 
 ### ✅ Adicionado

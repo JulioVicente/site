@@ -101,8 +101,25 @@ mcp-dataverse/
 ├── requirements.txt           # Python dependencies
 ├── .env.example              # Environment variables template
 ├── .gitignore                # Git ignore rules
-└── README.md                 # This file
+├── README.md                 # This file
+├── COST_ANALYSIS.md          # Azure cost impact analysis
+├── ARCHITECTURE.md           # Architecture documentation
+├── SETUP.md                  # Setup guide
+├── DEPLOY.md                 # Deployment guide
+└── API.md                    # API reference
 ```
+
+## 💰 Custos Azure
+
+Esta implementação é altamente custo-efetiva:
+
+- **Até 1M requisições/mês:** GRÁTIS (Consumption Plan)
+- **5M requisições/mês:** ~$66/mês
+- **10M requisições/mês:** ~$150/mês
+
+O cache em memória reduz custos em **80-90%** comparado a uma implementação sem cache, além de eliminar problemas de throttling do Dataverse.
+
+📊 **[Ver análise completa de custos](COST_ANALYSIS.md)**
 
 ## 🚀 Configuração
 
