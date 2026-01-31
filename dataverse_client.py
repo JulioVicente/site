@@ -3,6 +3,7 @@ Dataverse Client
 Handles authentication and API calls to Microsoft Dataverse
 """
 import os
+import re
 import requests
 from typing import List, Dict, Optional, Any
 from datetime import datetime, timedelta
@@ -12,6 +13,9 @@ import math
 class DataverseClient:
     """Client for interacting with Microsoft Dataverse API"""
     
+    # GUID validation pattern
+    GUID_PATTERN = re.compile(r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$', re.IGNORECASE)
+    
     def __init__(self):
         self.base_url = os.getenv("DATAVERSE_URL", "").rstrip("/")
         self.client_id = os.getenv("DATAVERSE_CLIENT_ID")
@@ -20,6 +24,20 @@ class DataverseClient:
         self.api_url = f"{self.base_url}/api/data/v9.2"
         self._access_token = None
         self._token_expires_at = None
+    
+    @staticmethod
+    def _sanitize_string(value: str) -> str:
+        """Sanitize string values for OData queries by escaping single quotes"""
+        if value is None:
+            return ""
+        return value.replace("'", "''")
+    
+    @staticmethod
+    def _validate_guid(guid: str) -> str:
+        """Validate and return GUID, raise ValueError if invalid"""
+        if not DataverseClient.GUID_PATTERN.match(guid):
+            raise ValueError(f"Invalid GUID format: {guid}")
+        return guid
     
     def _get_access_token(self) -> str:
         """Get OAuth access token for Dataverse API"""
@@ -79,14 +97,17 @@ class DataverseClient:
     # Account (Company) operations
     def search_accounts_by_id(self, account_id: str) -> List[Dict[str, Any]]:
         """Search accounts by ID"""
+        account_id = self._validate_guid(account_id)
         return self._query("accounts", filter_query=f"accountid eq {account_id}")
     
     def search_accounts_by_name(self, name: str) -> List[Dict[str, Any]]:
         """Search accounts by name"""
+        name = self._sanitize_string(name)
         return self._query("accounts", filter_query=f"contains(name, '{name}')")
     
     def search_accounts_by_cnpj(self, cnpj: str) -> List[Dict[str, Any]]:
         """Search accounts by CNPJ"""
+        cnpj = self._sanitize_string(cnpj)
         return self._query("accounts", filter_query=f"new_cnpj eq '{cnpj}'")
     
     def search_accounts_by_proximity(self, cep: str, radius_km: float = 50) -> List[Dict[str, Any]]:
@@ -98,6 +119,7 @@ class DataverseClient:
         """
         # First, get the coordinates for the CEP (this would need a geocoding service)
         # For this example, we'll search by CEP directly
+        cep = self._sanitize_string(cep)
         accounts = self._query("accounts", filter_query=f"contains(address1_postalcode, '{cep}')")
         
         # In a real implementation, you would calculate distance using Haversine formula
@@ -146,10 +168,12 @@ class DataverseClient:
     # Contact operations
     def search_contacts_by_id(self, contact_id: str) -> List[Dict[str, Any]]:
         """Search contacts by ID"""
+        contact_id = self._validate_guid(contact_id)
         return self._query("contacts", filter_query=f"contactid eq {contact_id}")
     
     def search_contacts_by_name(self, name: str) -> List[Dict[str, Any]]:
         """Search contacts by name"""
+        name = self._sanitize_string(name)
         return self._query(
             "contacts",
             filter_query=f"contains(fullname, '{name}') or contains(firstname, '{name}') or contains(lastname, '{name}')"
@@ -157,6 +181,7 @@ class DataverseClient:
     
     def search_contacts_by_email(self, email: str) -> List[Dict[str, Any]]:
         """Search contacts by email"""
+        email = self._sanitize_string(email)
         return self._query(
             "contacts",
             filter_query=f"contains(emailaddress1, '{email}') or contains(emailaddress2, '{email}')"
@@ -165,28 +190,34 @@ class DataverseClient:
     # Opportunity operations
     def search_opportunities_by_id(self, opportunity_id: str) -> List[Dict[str, Any]]:
         """Search opportunities by ID"""
+        opportunity_id = self._validate_guid(opportunity_id)
         return self._query("opportunities", filter_query=f"opportunityid eq {opportunity_id}")
     
     def search_opportunities_by_name(self, name: str) -> List[Dict[str, Any]]:
         """Search opportunities by name"""
+        name = self._sanitize_string(name)
         return self._query("opportunities", filter_query=f"contains(name, '{name}')")
     
     def search_opportunities_by_account(self, account_id: str) -> List[Dict[str, Any]]:
         """Search opportunities by account"""
+        account_id = self._validate_guid(account_id)
         return self._query("opportunities", filter_query=f"_customerid_value eq {account_id}")
     
     # Quote operations
     def search_quotes_by_opportunity(self, opportunity_id: str) -> List[Dict[str, Any]]:
         """Search quotes by opportunity"""
+        opportunity_id = self._validate_guid(opportunity_id)
         return self._query("quotes", filter_query=f"_opportunityid_value eq {opportunity_id}")
     
     def search_quotes_by_code(self, quote_number: str) -> List[Dict[str, Any]]:
         """Search quotes by quote code/number"""
+        quote_number = self._sanitize_string(quote_number)
         return self._query("quotes", filter_query=f"quotenumber eq '{quote_number}'")
     
     # Product operations
     def search_products_by_opportunity(self, opportunity_id: str) -> List[Dict[str, Any]]:
         """Search products from an opportunity"""
+        opportunity_id = self._validate_guid(opportunity_id)
         return self._query(
             "opportunityproducts",
             filter_query=f"_opportunityid_value eq {opportunity_id}"

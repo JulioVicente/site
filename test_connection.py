@@ -39,9 +39,9 @@ def test_connection():
             missing_vars.append(var)
             print(f"  ✗ {var}: NOT SET")
         else:
-            # Mask sensitive values
+            # Mask sensitive values - show nothing for secrets
             if "SECRET" in var:
-                display_value = value[:4] + "*" * (len(value) - 4)
+                display_value = "****"
             else:
                 display_value = value
             print(f"  ✓ {var}: {display_value}")
