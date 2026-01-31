@@ -92,22 +92,41 @@ DATAVERSE_CACHE_TTL=300       # Tempo de vida em segundos (padrão: 5 minutos)
 
 ```
 mcp-dataverse/
-├── __init__.py                 # Azure Function handler
-├── mcp_server.py              # MCP server implementation
-├── dataverse_client.py        # Dataverse API client
-├── dataverse_models.py        # Pydantic models for entities
-├── function.json              # Azure Function configuration
-├── host.json                  # Azure Functions host config
-├── requirements.txt           # Python dependencies
-├── .env.example              # Environment variables template
-├── .gitignore                # Git ignore rules
-├── README.md                 # This file
-├── COST_ANALYSIS.md          # Azure cost impact analysis
-├── ARCHITECTURE.md           # Architecture documentation
-├── SETUP.md                  # Setup guide
-├── DEPLOY.md                 # Deployment guide
-└── API.md                    # API reference
+├── __init__.py                   # Azure Function handler
+├── mcp_server.py                # MCP server implementation
+├── dataverse_client.py          # Dataverse API client
+├── dataverse_models.py          # Pydantic models for entities
+├── function.json                # Azure Function configuration
+├── host.json                    # Azure Functions host config
+├── requirements.txt             # Python dependencies
+├── .env.example                 # Environment variables template
+├── .gitignore                   # Git ignore rules
+├── README.md                    # This file
+├── COST_ANALYSIS.md             # Azure cost impact analysis
+├── BUSINESS_INTELLIGENCE.md     # BI analysis and data models
+├── ARCHITECTURE.md              # Architecture documentation
+├── SETUP.md                     # Setup guide
+├── DEPLOY.md                    # Deployment guide
+└── API.md                       # API reference
 ```
+
+## 📊 Business Intelligence
+
+O projeto agora inclui modelos e análise para casos de uso avançados de BI:
+
+- **Otimização de Rotas de Visita** - Planejamento geográfico usando coordenadas GPS
+- **Análise de Compras por Período** - Padrões de compra e sazonalidade
+- **Segmentação por CNAE/Indústria** - Classificação de empresas por setor
+- **Scoring de Potencial** - Avaliação de valor potencial de cada cliente
+- **Gestão de Contatos** - Visão consolidada de stakeholders
+- **Gestão de Renovações** - Ciclo de vida de contratos e produtos
+
+**Novos Modelos Dataverse:**
+- `Order` - Pedidos efetivados
+- `OrderProduct` - Itens de pedidos
+- `Contract` - Contratos e renovações
+
+📈 **[Ver análise completa de Business Intelligence](BUSINESS_INTELLIGENCE.md)**
 
 ## 💰 Custos Azure
 

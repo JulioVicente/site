@@ -1,5 +1,80 @@
 # Changelog - MCP Dataverse
 
+## [2024-01-31] - Business Intelligence Models and Analysis
+
+### ✅ Adicionado
+
+#### Documentação de Business Intelligence
+- **BUSINESS_INTELLIGENCE.md**: Análise completa de objetos Dataverse para BI (1150+ linhas)
+  - Identificação de 11 objetos/entidades relevantes para BI
+  - Análise detalhada de 6 casos de uso:
+    1. Otimização de rotas de visita de empresas
+    2. Análise de compras típicas por período
+    3. Segmentação por CNAE/indústria
+    4. Scoring de potencial de empresas
+    5. Visão consolidada de contatos
+    6. Gestão de compras e renovações de produtos
+  - Modelo de scoring com algoritmo completo
+  - Relacionamentos entre entidades
+  - Queries de exemplo para cada caso de uso
+  - Priorização de implementação por fase
+
+#### Novos Modelos Dataverse
+- **Order** - Representa pedidos efetivados
+  - Campos: orderid, ordernumber, customerid, totalamount, orderdate, etc.
+  - Essencial para análise de compras reais
+  - Suporta tipos: new, renewal, upsell
+  
+- **OrderProduct** - Itens/linhas de pedidos
+  - Campos: orderproductid, orderid, productid, quantity, priceperunit, etc.
+  - Permite análise detalhada de produtos vendidos
+  
+- **Contract** - Contratos com clientes
+  - Campos: contractid, customerid, MRR, ARR, renewal_date, etc.
+  - Essencial para gestão de renovações
+  - Suporta auto-renewal e tracking de status
+
+#### Campos Necessários Identificados
+- **Account**: 20+ campos adicionais para segmentação, scoring e rotas
+  - industrycode, cnae_description, segment
+  - customerscore, potentialscore, accountrating
+  - territory, visit_frequency, next_scheduled_visit
+  - purchase_frequency, total_purchases, lifetime_value
+  
+- **Contact**: 10+ campos para hierarquia e influência
+  - decision_maker, influencer, seniority_level
+  - reports_to, budget_authority
+  
+- **Product**: Campos para renovação
+  - is_recurring, renewal_frequency, default_contract_term
+
+#### Análises e Algoritmos
+- Modelo de scoring de potencial (0-100 pontos)
+- Algoritmo de otimização de rotas (TSP)
+- Análise RFM (Recency, Frequency, Monetary)
+- Métricas de renovação (renewal rate, churn, NRR, GRR)
+- Dashboard de renovações com alertas
+
+### 📊 Principais Destaques
+
+**Objetos por Criticidade:**
+- ⭐⭐⭐⭐⭐ Críticos: Account, Contact, Order, Contract
+- ⭐⭐⭐⭐ Altos: Opportunity, Quote, Product, OrderProduct
+
+**Casos de Uso Cobertos:**
+1. 🗺️ Rotas de Visita → Account (lat/long) + Visit
+2. 🛒 Compras → Order + OrderProduct
+3. 🏢 Segmentação → Account (industrycode, cnae) + Industry
+4. 📊 Scoring → Todos os objetos (algoritmo multi-fator)
+5. 👥 Contatos → Contact (hierarquia e influência)
+6. 🔄 Renovações → Contract + Order (tipo renewal)
+
+**Fases de Implementação:**
+- Fase 1: ✅ Objetos básicos (já implementados)
+- Fase 2: 🔴 Order, OrderProduct, Contract (crítico)
+- Fase 3: 🟡 Visit, Industry (importante)
+- Fase 4: 🟢 Campos adicionais (gradual)
+
 ## [2024-01-31] - Análise de Custos Azure
 
 ### ✅ Adicionado

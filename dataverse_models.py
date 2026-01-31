@@ -164,3 +164,130 @@ class OpportunityProduct(BaseModel):
     
     class Config:
         populate_by_name = True
+
+
+class Order(BaseModel):
+    """
+    Order (Pedido) entity in Dataverse
+    Represents an actual purchase/order from a customer
+    """
+    orderid: Optional[str] = Field(None, description="Unique identifier for the order")
+    ordernumber: Optional[str] = Field(None, description="Order number")
+    name: Optional[str] = Field(None, description="Order name")
+    
+    # Relationships
+    customerid: Optional[str] = Field(None, alias="_customerid_value", description="Customer account ID")
+    opportunityid: Optional[str] = Field(None, alias="_opportunityid_value", description="Related opportunity ID")
+    quoteid: Optional[str] = Field(None, alias="_quoteid_value", description="Related quote ID")
+    
+    # Values
+    totalamount: Optional[float] = Field(None, description="Total amount")
+    totaltax: Optional[float] = Field(None, description="Total tax")
+    totallineitemamount: Optional[float] = Field(None, description="Total line items")
+    discountamount: Optional[float] = Field(None, description="Discount amount")
+    freightamount: Optional[float] = Field(None, description="Freight amount")
+    
+    # Dates
+    orderdate: Optional[datetime] = Field(None, alias="new_orderdate", description="Order date")
+    requesteddeliverydate: Optional[datetime] = Field(None, description="Requested delivery date")
+    actualdeliverydate: Optional[datetime] = Field(None, description="Actual delivery date")
+    
+    # Status
+    statecode: Optional[int] = Field(None, description="State code (0=Active, 1=Submitted, etc)")
+    statuscode: Optional[int] = Field(None, description="Status reason code")
+    orderstatus: Optional[str] = Field(None, description="Order status")
+    
+    # Type
+    ordertype: Optional[str] = Field(None, description="Order type (new, renewal, upsell)")
+    
+    # Payment
+    paymentterms: Optional[str] = Field(None, description="Payment terms")
+    paymentstatus: Optional[str] = Field(None, description="Payment status")
+    
+    # Standard Dataverse fields
+    createdon: Optional[datetime] = Field(None, description="Date and time when the record was created")
+    modifiedon: Optional[datetime] = Field(None, description="Date and time when the record was last modified")
+    
+    class Config:
+        populate_by_name = True
+
+
+class OrderProduct(BaseModel):
+    """
+    OrderProduct (Item do Pedido) entity in Dataverse
+    Represents a line item in an order
+    """
+    orderproductid: Optional[str] = Field(None, description="Unique identifier for the order product")
+    orderid: Optional[str] = Field(None, alias="_orderid_value", description="Order ID")
+    productid: Optional[str] = Field(None, alias="_productid_value", description="Product ID")
+    
+    # Quantities
+    quantity: Optional[float] = Field(None, description="Quantity ordered")
+    shippedquantity: Optional[float] = Field(None, description="Quantity shipped")
+    
+    # Values
+    priceperunit: Optional[float] = Field(None, description="Price per unit")
+    baseamount: Optional[float] = Field(None, description="Base amount")
+    tax: Optional[float] = Field(None, description="Tax amount")
+    extendedamount: Optional[float] = Field(None, description="Extended amount")
+    manualdiscount: Optional[float] = Field(None, description="Manual discount")
+    
+    # Details
+    description: Optional[str] = Field(None, description="Product description")
+    lineitemnumber: Optional[int] = Field(None, description="Line item number")
+    
+    # Standard Dataverse fields
+    createdon: Optional[datetime] = Field(None, description="Date and time when the record was created")
+    modifiedon: Optional[datetime] = Field(None, description="Date and time when the record was last modified")
+    
+    class Config:
+        populate_by_name = True
+
+
+class Contract(BaseModel):
+    """
+    Contract (Contrato) entity in Dataverse
+    Represents contracts with customers
+    """
+    contractid: Optional[str] = Field(None, description="Unique identifier for the contract")
+    contractnumber: Optional[str] = Field(None, description="Contract number")
+    title: Optional[str] = Field(None, description="Contract title")
+    
+    # Relationships
+    customerid: Optional[str] = Field(None, alias="_customerid_value", description="Customer account ID")
+    billingaccountid: Optional[str] = Field(None, alias="_billingaccountid_value", description="Billing account ID")
+    
+    # Dates
+    contractstartdate: Optional[datetime] = Field(None, description="Contract start date")
+    contractenddate: Optional[datetime] = Field(None, description="Contract end date")
+    renewaldate: Optional[datetime] = Field(None, description="Renewal date")
+    cancellationdate: Optional[datetime] = Field(None, description="Cancellation date")
+    
+    # Values
+    totalcontractvalue: Optional[float] = Field(None, description="Total contract value")
+    monthlyrecurringrevenue: Optional[float] = Field(None, alias="new_mrr", description="Monthly recurring revenue (MRR)")
+    annualrecurringrevenue: Optional[float] = Field(None, alias="new_arr", description="Annual recurring revenue (ARR)")
+    
+    # Renewal
+    contractterm: Optional[int] = Field(None, description="Contract term in months")
+    renewalnoticerequired: Optional[int] = Field(None, description="Renewal notice required (days)")
+    autorenewal: Optional[bool] = Field(None, description="Auto-renewal enabled")
+    renewalstatus: Optional[str] = Field(None, description="Renewal status (pending, renewed, not_renewed)")
+    
+    # Status
+    statecode: Optional[int] = Field(None, description="State code")
+    statuscode: Optional[int] = Field(None, description="Status reason code")
+    contractstatus: Optional[str] = Field(None, description="Contract status")
+    
+    # Type
+    contracttype: Optional[str] = Field(None, description="Contract type (standard, custom, framework)")
+    paymentterms: Optional[str] = Field(None, description="Payment terms")
+    billingfrequency: Optional[str] = Field(None, description="Billing frequency (monthly, quarterly, annual)")
+    
+    # Standard Dataverse fields
+    createdon: Optional[datetime] = Field(None, description="Date and time when the record was created")
+    modifiedon: Optional[datetime] = Field(None, description="Date and time when the record was last modified")
+    
+    class Config:
+        populate_by_name = True
+
