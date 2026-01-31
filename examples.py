@@ -195,6 +195,30 @@ def main():
     except Exception as e:
         print(f"Error: {e}")
     
+    # Example 11: Get cache statistics
+    print("\n11. Obtendo estatísticas do cache:")
+    print("-" * 80)
+    try:
+        result = client.call_tool(
+            "get_cache_stats",
+            {}
+        )
+        print(json.dumps(result, indent=2))
+    except Exception as e:
+        print(f"Error: {e}")
+    
+    # Example 12: Clear cache
+    print("\n12. Limpando cache:")
+    print("-" * 80)
+    try:
+        result = client.call_tool(
+            "clear_cache",
+            {}
+        )
+        print(json.dumps(result, indent=2))
+    except Exception as e:
+        print(f"Error: {e}")
+    
     print("\n" + "=" * 80)
     print("Examples completed!")
     print("=" * 80)

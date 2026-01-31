@@ -519,6 +519,119 @@ Busca produtos relacionados a uma oportunidade.
 }
 ```
 
+## Ferramentas de Gerenciamento de Cache
+
+### clear_cache
+
+Limpa todas as entradas do cache em memória.
+
+**Argumentos:** Nenhum
+
+**Exemplo:**
+```json
+{
+  "jsonrpc": "2.0",
+  "method": "tools/call",
+  "params": {
+    "name": "clear_cache",
+    "arguments": {}
+  },
+  "id": 1
+}
+```
+
+**Resposta:**
+```json
+{
+  "jsonrpc": "2.0",
+  "result": {
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\": \"success\", \"message\": \"Cache cleared successfully\"}"
+      }
+    ]
+  },
+  "id": 1
+}
+```
+
+### get_cache_stats
+
+Obtém estatísticas do cache (número de entradas e tamanho estimado).
+
+**Argumentos:** Nenhum
+
+**Exemplo:**
+```json
+{
+  "jsonrpc": "2.0",
+  "method": "tools/call",
+  "params": {
+    "name": "get_cache_stats",
+    "arguments": {}
+  },
+  "id": 1
+}
+```
+
+**Resposta:**
+```json
+{
+  "jsonrpc": "2.0",
+  "result": {
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"total_entries\": 15, \"cache_size_bytes\": 45678}"
+      }
+    ]
+  },
+  "id": 1
+}
+```
+
+## Cache em Memória
+
+### Configuração
+
+O servidor implementa um cache em memória simples para melhorar a performance:
+
+**Variáveis de Ambiente:**
+- `DATAVERSE_CACHE_ENABLED`: Habilita/desabilita o cache (padrão: `true`)
+- `DATAVERSE_CACHE_TTL`: Tempo de vida das entradas em segundos (padrão: `300` = 5 minutos)
+
+**Exemplo de configuração:**
+```bash
+az functionapp config appsettings set \
+  --name mcp-dataverse-func \
+  --resource-group mcp-dataverse-rg \
+  --settings \
+    DATAVERSE_CACHE_ENABLED="true" \
+    DATAVERSE_CACHE_TTL="600"
+```
+
+### Comportamento do Cache
+
+- **Automático**: Todas as queries são automaticamente cacheadas quando o cache está habilitado
+- **TTL**: Entradas expiram automaticamente após o tempo configurado
+- **Limpeza**: Entradas expiradas são removidas automaticamente
+- **Chave única**: Cada query gera uma chave única baseada em entity, filtros e campos selecionados
+- **Reciclagem**: O cache é limpo quando a Azure Function é reciclada (cold start)
+
+### Quando usar o Cache
+
+**✅ Bom para:**
+- Dados que mudam raramente (ex: produtos, catálogos)
+- Consultas repetidas durante a mesma sessão
+- Reduzir chamadas à API do Dataverse
+- Melhorar tempo de resposta
+
+**❌ Evite para:**
+- Dados em tempo real que mudam frequentemente
+- Operações de escrita/atualização
+- Dados sensíveis que precisam estar sempre atualizados
+
 ## Códigos de Erro
 
 ### Códigos JSON-RPC Padrão

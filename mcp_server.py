@@ -276,6 +276,22 @@ class MCPDataverseServer:
                     },
                     "required": ["opportunity_id"]
                 }
+            },
+            {
+                "name": "clear_cache",
+                "description": "Clear all cached query results",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {}
+                }
+            },
+            {
+                "name": "get_cache_stats",
+                "description": "Get cache statistics (total entries and size)",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {}
+                }
             }
         ]
     
@@ -385,6 +401,14 @@ class MCPDataverseServer:
         # Product operations
         elif tool_name == "search_products_by_opportunity":
             return self.client.search_products_by_opportunity(arguments["opportunity_id"])
+        
+        # Cache operations
+        elif tool_name == "clear_cache":
+            self.client.clear_cache()
+            return {"status": "success", "message": "Cache cleared successfully"}
+        
+        elif tool_name == "get_cache_stats":
+            return self.client.get_cache_stats()
         
         else:
             raise ValueError(f"Unknown tool: {tool_name}")

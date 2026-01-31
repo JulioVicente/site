@@ -31,6 +31,31 @@ Este projeto implementa um servidor MCP que fornece acesso aos seguintes recurso
 ### 📦 Produtos
 - Buscar produtos de uma oportunidade
 
+### 🔧 Gerenciamento
+- Limpar cache de queries
+- Obter estatísticas do cache
+
+## ⚡ Cache em Memória
+
+O servidor inclui um sistema de cache em memória simples para melhorar a performance:
+
+- **TTL (Time To Live)**: Cache expira automaticamente após 5 minutos (configurável)
+- **Habilitação**: Pode ser habilitado/desabilitado via variável de ambiente
+- **Sem dependências externas**: Usa apenas memória da Azure Function
+- **Limpeza automática**: Entradas expiradas são removidas automaticamente
+
+**Configuração:**
+```bash
+DATAVERSE_CACHE_ENABLED=true  # Habilita/desabilita o cache
+DATAVERSE_CACHE_TTL=300       # Tempo de vida em segundos (padrão: 5 minutos)
+```
+
+**Ferramentas de gerenciamento:**
+- `clear_cache`: Limpa todas as entradas do cache
+- `get_cache_stats`: Retorna estatísticas (total de entradas e tamanho)
+
+**Nota:** O cache é limpo automaticamente quando a Azure Function é reciclada (warm-up).
+
 ## 🏗️ Arquitetura
 
 ```

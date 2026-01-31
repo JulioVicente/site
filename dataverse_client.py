@@ -5,9 +5,76 @@ Handles authentication and API calls to Microsoft Dataverse
 import os
 import re
 import requests
-from typing import List, Dict, Optional, Any
+import hashlib
+import json
+from typing import List, Dict, Optional, Any, Tuple
 from datetime import datetime, timedelta
 import math
+
+
+class SimpleCache:
+    """Simple in-memory cache with TTL (Time To Live)"""
+    
+    def __init__(self, default_ttl_seconds: int = 300):
+        """
+        Initialize cache
+        
+        Args:
+            default_ttl_seconds: Default time to live for cache entries (default: 5 minutes)
+        """
+        self._cache: Dict[str, Tuple[Any, datetime]] = {}
+        self._default_ttl = default_ttl_seconds
+    
+    def get(self, key: str) -> Optional[Any]:
+        """
+        Get value from cache if not expired
+        
+        Args:
+            key: Cache key
+            
+        Returns:
+            Cached value or None if not found or expired
+        """
+        if key in self._cache:
+            value, expiry = self._cache[key]
+            if datetime.now() < expiry:
+                return value
+            else:
+                # Remove expired entry
+                del self._cache[key]
+        return None
+    
+    def set(self, key: str, value: Any, ttl_seconds: Optional[int] = None) -> None:
+        """
+        Set value in cache with TTL
+        
+        Args:
+            key: Cache key
+            value: Value to cache
+            ttl_seconds: Time to live in seconds (uses default if not specified)
+        """
+        ttl = ttl_seconds if ttl_seconds is not None else self._default_ttl
+        expiry = datetime.now() + timedelta(seconds=ttl)
+        self._cache[key] = (value, expiry)
+    
+    def clear(self) -> None:
+        """Clear all cache entries"""
+        self._cache.clear()
+    
+    def cleanup_expired(self) -> None:
+        """Remove all expired entries from cache"""
+        now = datetime.now()
+        expired_keys = [key for key, (_, expiry) in self._cache.items() if now >= expiry]
+        for key in expired_keys:
+            del self._cache[key]
+    
+    def get_stats(self) -> Dict[str, int]:
+        """Get cache statistics"""
+        self.cleanup_expired()
+        return {
+            "total_entries": len(self._cache),
+            "cache_size_bytes": sum(len(str(v)) for v, _ in self._cache.values())
+        }
 
 
 class DataverseClient:
@@ -60,6 +127,24 @@ class DataverseClient:
         self.api_url = f"{self.base_url}/api/data/v9.2"
         self._access_token = None
         self._token_expires_at = None
+        
+        # Initialize cache with 5 minute TTL by default
+        cache_ttl = int(os.getenv("DATAVERSE_CACHE_TTL", "300"))
+        self._cache = SimpleCache(default_ttl_seconds=cache_ttl)
+        self._cache_enabled = os.getenv("DATAVERSE_CACHE_ENABLED", "true").lower() == "true"
+    
+    @staticmethod
+    def _generate_cache_key(entity: str, filter_query: Optional[str], 
+                           select: Optional[str], top: int) -> str:
+        """Generate a unique cache key based on query parameters"""
+        key_data = {
+            "entity": entity,
+            "filter": filter_query or "",
+            "select": select or "",
+            "top": top
+        }
+        key_string = json.dumps(key_data, sort_keys=True)
+        return hashlib.md5(key_string.encode()).hexdigest()
     
     @staticmethod
     def _sanitize_string(value: str) -> str:
@@ -112,8 +197,30 @@ class DataverseClient:
         }
     
     def _query(self, entity: str, filter_query: Optional[str] = None, 
-               select: Optional[str] = None, top: int = 100) -> List[Dict[str, Any]]:
-        """Execute a query against Dataverse"""
+               select: Optional[str] = None, top: int = 100, use_cache: bool = True) -> List[Dict[str, Any]]:
+        """
+        Execute a query against Dataverse with optional caching
+        
+        Args:
+            entity: Entity name to query
+            filter_query: OData filter query
+            select: Fields to select
+            top: Maximum number of results
+            use_cache: Whether to use cache for this query (default: True)
+        
+        Returns:
+            List of entity records
+        """
+        # Generate cache key
+        cache_key = self._generate_cache_key(entity, filter_query, select, top)
+        
+        # Try to get from cache if enabled
+        if self._cache_enabled and use_cache:
+            cached_result = self._cache.get(cache_key)
+            if cached_result is not None:
+                return cached_result
+        
+        # Execute query
         url = f"{self.api_url}/{entity}"
         params = {}
         
@@ -128,7 +235,21 @@ class DataverseClient:
         response.raise_for_status()
         
         data = response.json()
-        return data.get("value", [])
+        result = data.get("value", [])
+        
+        # Store in cache if enabled
+        if self._cache_enabled and use_cache:
+            self._cache.set(cache_key, result)
+        
+        return result
+    
+    def clear_cache(self) -> None:
+        """Clear all cached query results"""
+        self._cache.clear()
+    
+    def get_cache_stats(self) -> Dict[str, int]:
+        """Get cache statistics"""
+        return self._cache.get_stats()
     
     # Account (Company) operations
     def search_accounts_by_id(self, account_id: str) -> List[Dict[str, Any]]:
