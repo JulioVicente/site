@@ -16,6 +16,42 @@ class DataverseClient:
     # GUID validation pattern
     GUID_PATTERN = re.compile(r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$', re.IGNORECASE)
     
+    # Field selections for complete entity returns
+    ACCOUNT_FIELDS = (
+        "accountid,name,accountnumber,new_cnpj,numberofemployees,revenue,"
+        "address1_postalcode,address1_line1,address1_city,address1_stateorprovince,"
+        "address1_country,address1_latitude,address1_longitude,"
+        "new_lastvisitdate,new_lastcontactdate,telephone1,emailaddress1,websiteurl,"
+        "createdon,modifiedon,statecode,statuscode"
+    )
+    
+    CONTACT_FIELDS = (
+        "contactid,firstname,lastname,fullname,emailaddress1,emailaddress2,"
+        "telephone1,mobilephone,jobtitle,_parentcustomerid_value,"
+        "createdon,modifiedon,statecode,statuscode,address1_line1,address1_city,"
+        "address1_stateorprovince,address1_postalcode,address1_country"
+    )
+    
+    OPPORTUNITY_FIELDS = (
+        "opportunityid,name,_customerid_value,estimatedvalue,estimatedclosedate,"
+        "actualvalue,actualclosedate,statuscode,statecode,description,"
+        "createdon,modifiedon,closeprobability,budgetamount,purchasetimeframe,"
+        "purchaseprocess,decisionmaker,timeline"
+    )
+    
+    QUOTE_FIELDS = (
+        "quoteid,name,quotenumber,_opportunityid_value,_customerid_value,"
+        "totalamount,totaltax,totallineitemamount,statuscode,statecode,"
+        "effectivefrom,effectiveto,createdon,modifiedon,discountamount,"
+        "discountpercentage,freightamount"
+    )
+    
+    OPPORTUNITY_PRODUCT_FIELDS = (
+        "opportunityproductid,_opportunityid_value,_productid_value,"
+        "quantity,priceperunit,baseamount,tax,extendedamount,"
+        "createdon,modifiedon,description,lineitemnumber"
+    )
+    
     def __init__(self):
         self.base_url = os.getenv("DATAVERSE_URL", "").rstrip("/")
         self.client_id = os.getenv("DATAVERSE_CLIENT_ID")
@@ -96,9 +132,13 @@ class DataverseClient:
     
     # Account (Company) operations
     def search_accounts_by_id(self, account_id: str) -> List[Dict[str, Any]]:
-        """Search accounts by ID"""
+        """Search accounts by ID with complete field set"""
         account_id = self._validate_guid(account_id)
-        return self._query("accounts", filter_query=f"accountid eq {account_id}")
+        return self._query(
+            "accounts",
+            filter_query=f"accountid eq {account_id}",
+            select=self.ACCOUNT_FIELDS
+        )
     
     def search_accounts_by_name(self, name: str) -> List[Dict[str, Any]]:
         """Search accounts by name"""
@@ -167,9 +207,13 @@ class DataverseClient:
     
     # Contact operations
     def search_contacts_by_id(self, contact_id: str) -> List[Dict[str, Any]]:
-        """Search contacts by ID"""
+        """Search contacts by ID with complete field set"""
         contact_id = self._validate_guid(contact_id)
-        return self._query("contacts", filter_query=f"contactid eq {contact_id}")
+        return self._query(
+            "contacts",
+            filter_query=f"contactid eq {contact_id}",
+            select=self.CONTACT_FIELDS
+        )
     
     def search_contacts_by_name(self, name: str) -> List[Dict[str, Any]]:
         """Search contacts by name"""
@@ -189,9 +233,13 @@ class DataverseClient:
     
     # Opportunity operations
     def search_opportunities_by_id(self, opportunity_id: str) -> List[Dict[str, Any]]:
-        """Search opportunities by ID"""
+        """Search opportunities by ID with complete field set"""
         opportunity_id = self._validate_guid(opportunity_id)
-        return self._query("opportunities", filter_query=f"opportunityid eq {opportunity_id}")
+        return self._query(
+            "opportunities",
+            filter_query=f"opportunityid eq {opportunity_id}",
+            select=self.OPPORTUNITY_FIELDS
+        )
     
     def search_opportunities_by_name(self, name: str) -> List[Dict[str, Any]]:
         """Search opportunities by name"""
@@ -205,22 +253,31 @@ class DataverseClient:
     
     # Quote operations
     def search_quotes_by_opportunity(self, opportunity_id: str) -> List[Dict[str, Any]]:
-        """Search quotes by opportunity"""
+        """Search quotes by opportunity with complete field set"""
         opportunity_id = self._validate_guid(opportunity_id)
-        return self._query("quotes", filter_query=f"_opportunityid_value eq {opportunity_id}")
+        return self._query(
+            "quotes",
+            filter_query=f"_opportunityid_value eq {opportunity_id}",
+            select=self.QUOTE_FIELDS
+        )
     
     def search_quotes_by_code(self, quote_number: str) -> List[Dict[str, Any]]:
-        """Search quotes by quote code/number"""
+        """Search quotes by quote code/number with complete field set"""
         quote_number = self._sanitize_string(quote_number)
-        return self._query("quotes", filter_query=f"quotenumber eq '{quote_number}'")
+        return self._query(
+            "quotes",
+            filter_query=f"quotenumber eq '{quote_number}'",
+            select=self.QUOTE_FIELDS
+        )
     
     # Product operations
     def search_products_by_opportunity(self, opportunity_id: str) -> List[Dict[str, Any]]:
-        """Search products from an opportunity"""
+        """Search products from an opportunity with complete field set"""
         opportunity_id = self._validate_guid(opportunity_id)
         return self._query(
             "opportunityproducts",
-            filter_query=f"_opportunityid_value eq {opportunity_id}"
+            filter_query=f"_opportunityid_value eq {opportunity_id}",
+            select=self.OPPORTUNITY_PRODUCT_FIELDS
         )
     
     def calculate_distance(self, lat1: float, lon1: float, lat2: float, lon2: float) -> float:

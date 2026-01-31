@@ -31,6 +31,11 @@ class Account(BaseModel):
     telephone1: Optional[str] = Field(None, description="Main phone number")
     emailaddress1: Optional[str] = Field(None, description="Email address")
     websiteurl: Optional[str] = Field(None, description="Website URL")
+    # Standard Dataverse fields
+    createdon: Optional[datetime] = Field(None, description="Date and time when the record was created")
+    modifiedon: Optional[datetime] = Field(None, description="Date and time when the record was last modified")
+    statecode: Optional[int] = Field(None, description="Status of the account (0=Active, 1=Inactive)")
+    statuscode: Optional[int] = Field(None, description="Reason for the status of the account")
     
     class Config:
         populate_by_name = True
@@ -50,6 +55,17 @@ class Contact(BaseModel):
     mobilephone: Optional[str] = Field(None, description="Mobile phone")
     jobtitle: Optional[str] = Field(None, description="Job title")
     parentcustomerid: Optional[str] = Field(None, alias="_parentcustomerid_value", description="Parent account ID")
+    # Address fields
+    address1_line1: Optional[str] = Field(None, description="Street address")
+    address1_city: Optional[str] = Field(None, description="City")
+    address1_stateorprovince: Optional[str] = Field(None, description="State or province")
+    address1_postalcode: Optional[str] = Field(None, description="ZIP/postal code")
+    address1_country: Optional[str] = Field(None, description="Country")
+    # Standard Dataverse fields
+    createdon: Optional[datetime] = Field(None, description="Date and time when the record was created")
+    modifiedon: Optional[datetime] = Field(None, description="Date and time when the record was last modified")
+    statecode: Optional[int] = Field(None, description="Status of the contact (0=Active, 1=Inactive)")
+    statuscode: Optional[int] = Field(None, description="Reason for the status of the contact")
     
     class Config:
         populate_by_name = True
@@ -69,6 +85,16 @@ class Opportunity(BaseModel):
     statuscode: Optional[int] = Field(None, description="Status code")
     statecode: Optional[int] = Field(None, description="State code")
     description: Optional[str] = Field(None, description="Description")
+    # Additional opportunity fields
+    closeprobability: Optional[int] = Field(None, description="Probability of closing the opportunity")
+    budgetamount: Optional[float] = Field(None, description="Budget amount")
+    purchasetimeframe: Optional[int] = Field(None, description="Purchase timeframe")
+    purchaseprocess: Optional[int] = Field(None, description="Purchase process")
+    decisionmaker: Optional[bool] = Field(None, description="Whether contact is the decision maker")
+    timeline: Optional[int] = Field(None, description="Timeline for the opportunity")
+    # Standard Dataverse fields
+    createdon: Optional[datetime] = Field(None, description="Date and time when the record was created")
+    modifiedon: Optional[datetime] = Field(None, description="Date and time when the record was last modified")
     
     class Config:
         populate_by_name = True
@@ -90,6 +116,13 @@ class Quote(BaseModel):
     statecode: Optional[int] = Field(None, description="State code")
     effectivefrom: Optional[datetime] = Field(None, description="Effective from date")
     effectiveto: Optional[datetime] = Field(None, description="Effective to date")
+    # Additional quote fields
+    discountamount: Optional[float] = Field(None, description="Discount amount")
+    discountpercentage: Optional[float] = Field(None, description="Discount percentage")
+    freightamount: Optional[float] = Field(None, description="Freight amount")
+    # Standard Dataverse fields
+    createdon: Optional[datetime] = Field(None, description="Date and time when the record was created")
+    modifiedon: Optional[datetime] = Field(None, description="Date and time when the record was last modified")
     
     class Config:
         populate_by_name = True
@@ -122,6 +155,12 @@ class OpportunityProduct(BaseModel):
     baseamount: Optional[float] = Field(None, description="Base amount")
     tax: Optional[float] = Field(None, description="Tax")
     extendedamount: Optional[float] = Field(None, description="Extended amount")
+    # Additional fields
+    description: Optional[str] = Field(None, description="Product description")
+    lineitemnumber: Optional[int] = Field(None, description="Line item number")
+    # Standard Dataverse fields
+    createdon: Optional[datetime] = Field(None, description="Date and time when the record was created")
+    modifiedon: Optional[datetime] = Field(None, description="Date and time when the record was last modified")
     
     class Config:
         populate_by_name = True
